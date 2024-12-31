@@ -1,11 +1,8 @@
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "minitalk.h"
 
 void handle_signal(int signum, siginfo_t *info, void *context)
 {
-    static int  bit = 0;
+    static int bit = 0;
     static char c = 0;
     static pid_t client_pid = 0;
 
@@ -28,4 +25,20 @@ void handle_signal(int signum, siginfo_t *info, void *context)
         c = 0;
         bit = 0;
     }
+}
+
+int main(void)
+{
+    struct sigaction sa;
+
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = handle_signal;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
+    printf("Server PID: %d\n", getpid());
+    while (1)
+        pause();
+
+    return 0;
 }

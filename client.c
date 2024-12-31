@@ -1,7 +1,4 @@
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "minitalk.h"
 
 void send_char(pid_t server_pid, char c)
 {
@@ -24,4 +21,23 @@ void send_message(pid_t server_pid, char *message)
     while (*message)
         send_char(server_pid, *message++);
     send_char(server_pid, '\0');
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        fprintf(stderr, "Usage: %s <server_pid> <message>\n", argv[0]);
+        return 1;
+    }
+
+    pid_t server_pid = (pid_t)atoi(argv[1]);
+    if (server_pid <= 0)
+    {
+        fprintf(stderr, "Invalid server PID: %d\n", server_pid);
+        return 1;
+    }
+
+    send_message(server_pid, argv[2]);
+    return 0;
 }
